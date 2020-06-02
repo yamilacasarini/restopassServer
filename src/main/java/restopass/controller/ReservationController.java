@@ -7,6 +7,7 @@ import restopass.dto.Reservation;
 import restopass.service.ReservationService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -43,14 +44,21 @@ public class ReservationController {
         this.reservationService.doneReservation(reservationId, restaurantId, userId);
     }
 
-    @RequestMapping(value = "/confirm/{reservationId}/{userId}", method = RequestMethod.PATCH)
-    public ModelAndView confirmReservation(@PathVariable String reservationId, @PathVariable String userId) {
+    @RequestMapping(value = "/confirm/{reservationId}/{userId}", method = RequestMethod.GET)
+    public ModelAndView confirmReservation(@PathVariable String reservationId, @PathVariable String userId) throws IOException {
         //TODO validar que ya no sea un usuario confirmado (Osea que este en la lista confirmedUsers de la reserva).
         //TODO mover al usuario de la list toConfirmUsers a confirmedUsers en la reserva, descontarle una visita y mandar mail con QR
         //TODO si ya tenia las visitas en cero porque o acepto otra invitacion o hizo el otra reserva, mostrar error y pedirle que cancele alguna
-        this.reservationService.confirmReservation(reservationId, userId);
+       // this.reservationService.confirmReservation(reservationId, userId);\
+
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("web de gracias por confirmar/error/ya confirmaste");
+//        Reservation reservation = reservationService.getReservationByAnyUser(reservationId, userId);
+//        if (reservation == null) {
+            modelAndView.setViewName("/reservation/error-reservation");
+//        }
+
+        modelAndView.addObject("name", "Juan");
+        //modelAndView.setViewName("confirm-reservation");
         return modelAndView;
     }
 

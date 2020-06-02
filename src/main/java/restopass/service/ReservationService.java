@@ -29,6 +29,7 @@ public class ReservationService {
     private String RESERVATION_ID = "reservationId";
     private String RESERVATION_STATE = "state";
     private String CONFIRMED_USERS = "confirmedUsers";
+    private String TO_CONFIRM_USERS = "toConfirmUsers";
     private String SLOTS_FIELD = "slots";
     private String RESERVATION_COLLECTION = "reservations";
     private String RESTAURANT_CONFIG_COLLECTION = "restaurant_configs";
@@ -117,6 +118,22 @@ public class ReservationService {
         query.addCriteria(orCriteria);
 
         return this.mongoTemplate.find(query, Reservation.class);
+    }
+
+    public Reservation getReservationByAnyUser(String reservationId, String userId) {
+        Query query = new Query();
+
+        Criteria orCriteria = new Criteria();
+        orCriteria.orOperator(
+                Criteria.where(OWNER_USER_ID).is(userId),
+                Criteria.where(CONFIRMED_USERS).in(userId),
+                Criteria.where(TO_CONFIRM_USERS).in(userId));
+
+
+        query.addCriteria(Criteria.where(RESERVATION_ID).is(reservationId));
+        query.addCriteria(orCriteria);
+
+        return this.mongoTemplate.findOne(query, Reservation.class);
     }
 
     public void cancelReservation(String reservationId) {

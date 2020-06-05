@@ -52,12 +52,15 @@ public class ReservationController {
        // this.reservationService.confirmReservation(reservationId, userId);\
 
         ModelAndView modelAndView = new ModelAndView();
-//        Reservation reservation = reservationService.getReservationByAnyUser(reservationId, userId);
+        //Reservation reservation = reservationService.getReservationByAnyUser(reservationId, userId);
 //        if (reservation == null) {
-            modelAndView.setViewName("/reservation/error-reservation");
+            modelAndView.setViewName("/reservation/canceled-reservation");
 //        }
 
         modelAndView.addObject("name", "Juan");
+        modelAndView.addObject("reservationId", "17384");
+        modelAndView.addObject("email", "prueba@prueba.com");
+        modelAndView.addObject("bookingOwner", "cancelador@prueba.com");
         //modelAndView.setViewName("confirm-reservation");
         return modelAndView;
     }

@@ -1,34 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html style=" background-color: #e9ecef" lang="en">
 <head>
     <#include "common/head.ftl"/>
 </head>
 <body>
-    <div class="container">
-
-        <div class="row -no-gutters" style="background-color: #00b686">
-            <div class="col-12">
-                <img style="width: 120px" src="https://i.ibb.co/WVZ88qx/LOGO-sin-Fondo-restopass-1.png" alt="restopass" border="0">
-            </div>
-        </div>
-
-        <div class="container ">
+<div style=" background-color: #e9ecef" class="container-fluid">
+    <#include "common/header.ftl"/>
+    <div class="row">
+        <div class="col-sm">
             <div class="row">
                 <div class="col-12">
-                    <h1 class="cualca">Hello, ${name}!</h1>
-
+                    <div class="jumbotron jumbotron-fluid">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h1>Enhorabuena, ${name}!</h1>
+                                    <p class="lead">Confirmaste la reserva ${reservationId}</p>
+                                    <hr class="my-4">
+                                    <p>
+                                        Te enviamos un email con el código QR a
+                                        <span class="font-weight-bold"> ${email}</span>. Podrás gestionar la reserva a través de la app.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-12">
-                <div class="alert alert-primary" role="alert">
-                    A simple primary alert—check it out!
-                </div>
-
-            </div>
-
         </div>
     </div>
+</div>
 <#include "common/footer.ftl"/>
+
 <#include "common/scripts.ftl"/>
 </body>
 </html>

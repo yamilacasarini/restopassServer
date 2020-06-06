@@ -13,7 +13,7 @@
                     <div class="jumbotron jumbotron-fluid">
                         <div class="container">
                             <div class="row align-items-center">
-                                <img style="width:100px" class="mr-2" src="https://i.ibb.co/RzLY46Q/confirm-1174801-1280.png" alt="confirm-1174801-1280" border="0">
+                                <img style="width:100px" class="mr-2" src="https://i.ibb.co/kMvrQqH/png-transparent-check-logo-check-mark-computer-icons-correct-miscellaneous-angle-text-thumbnail-1.png" alt="confirm-1174801-1280" border="0">
                                 <h1>Reserva ya confirmada</h1>
                             </div>
                             <div class="row">

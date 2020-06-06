@@ -14,7 +14,7 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col-12">
-                                    <h1>Enhorabuena, ${name}!</h1>
+                                    <h1>Genial, ${name}!</h1>
                                     <p class="lead">Confirmaste la reserva ${reservationId}</p>
                                     <hr class="my-4">
                                     <p>

@@ -15,14 +15,14 @@
                             <div class="row align-items-center">
                                 <img style="width:100px" class="mr-2" src="https://i.ibb.co/9gLnkbq/1200px-Flat-cross-icon-svg.png"
                                      alt="cancel-1174809-1280" border="10">
-                                <h1>     Reserva cancelada</h1>
+                                <h1>     Ups! Parece que ya no te quedan mas visitas</h1>
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <p class="lead mt-3">La reserva ${reservationId} fue cancelada por <span class="font-weight-bold">${bookingOwner}</span>.</p>
+                                    <p class="lead mt-3">No pudimos confirmar tu reserva por falta de visitas disponibles. No te preocupes! Guardaremos tu invitación</span>.</p>
                                     <hr class="my-4">
                                     <p>
-                                       No te preocupes! Puedes crear una nueva y gestionar todas tus reservas a través de la app.
+                                       Puedes cancelar alguna reserva que no hayas asistido aún o conseguir un plan con mas visitas a través de la app.
                                     </p>
                                 </div>
                             </div>

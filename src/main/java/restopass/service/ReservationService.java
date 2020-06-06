@@ -12,10 +12,10 @@ import restopass.utils.EmailSender;
 import restopass.utils.QRHelper;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 @Service
@@ -48,9 +48,10 @@ public class ReservationService {
     public void createReservation(Reservation reservation, String userId) {
         String reservationId = UUID.randomUUID().toString();
         reservation.setReservationId(reservationId);
-        /*
+
         RestaurantConfig restaurantConfig = this.findConfigurationByRestaurantId(reservation.getRestaurantId());
         List<RestaurantSlot> slots = this.restaurantService.decrementTableInSlot(restaurantConfig, reservation.getDate());
+        this.restaurantService.fillRestaurantData(reservation);
         this.updateSlotsInDB(reservation.getRestaurantId(), slots);
 
         this.userService.decrementUserVisits(userId);
@@ -59,7 +60,7 @@ public class ReservationService {
 
         this.sendConfirmBookingEmail(reservation);
         this.sendNewBookingEmail(reservation);
-           */
+
         this.reservationRepository.save(reservation);
     }
 
@@ -99,11 +100,13 @@ public class ReservationService {
 
         EmailModel emailModel = new EmailModel();
         emailModel.setEmailTo(reservation.getOwnerUser());
-        emailModel.setMailTempate("templates/new_booking.html");
+        emailModel.setMailTempate("new_booking.html");
         emailModel.setSubject("Parece que tienes una nueva reserva");
         emailModel.setModel(modelEmail);
 
-        EmailSender.sendEmail(emailModel);
+        String toConfirmAddresses = String.join(",", reservation.getToConfirmUsers());
+
+        EmailSender.sendMultipleEmails(emailModel, toConfirmAddresses);
     }
 
     public List<Reservation> getReservationsForUser(String userId) {

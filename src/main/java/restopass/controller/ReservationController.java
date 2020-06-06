@@ -38,10 +38,13 @@ public class ReservationController {
 
 
     @RequestMapping(value = "/done/{reservationId}", method = RequestMethod.PATCH)
-    public void doneReservation(@PathVariable String reservationId,
+    public ModelAndView doneReservation(@PathVariable String reservationId,
                                 @RequestParam(value = "restaurant_id") String restaurantId,
                                 @RequestParam(value = "user_id") String userId) {
         this.reservationService.doneReservation(reservationId, restaurantId, userId);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("/reservation/done-reservation");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/confirm/{reservationId}/{userId}", method = RequestMethod.GET)
@@ -54,7 +57,7 @@ public class ReservationController {
         ModelAndView modelAndView = new ModelAndView();
         //Reservation reservation = reservationService.getReservationByAnyUser(reservationId, userId);
 //        if (reservation == null) {
-            modelAndView.setViewName("/reservation/canceled-reservation");
+            modelAndView.setViewName("/reservation/no-more-visits");
 //        }
 
         modelAndView.addObject("name", "Juan");

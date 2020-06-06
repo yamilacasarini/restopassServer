@@ -151,4 +151,7 @@ public class RestaurantService {
     }
 
 
+    public void fillRestaurantData(Reservation reservation) {
+        Restaurant restaurant = this.findById(reservation.getRestaurantId());
+    }
 }

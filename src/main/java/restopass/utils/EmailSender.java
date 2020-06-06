@@ -1,7 +1,9 @@
 package restopass.utils;
 
+import java.util.List;
 import java.util.Map;
 
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -35,6 +37,22 @@ public class EmailSender {
 
             mimeMessageHelper.setSubject(mail.getSubject());
             mimeMessageHelper.setTo(mail.getEmailTo());
+            mail.setMailContent(geContentFromTemplate(mail.getMailTempate(), mail.getModel()));
+            mimeMessageHelper.setText(mail.getMailContent(), true);
+
+            mailSender.send(mimeMessageHelper.getMimeMessage());
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sendMultipleEmails(EmailModel mail, String addresses) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            mimeMessageHelper.setSubject(mail.getSubject());
+            mimeMessage.setRecipients(Message.RecipientType.CC, addresses);
             mail.setMailContent(geContentFromTemplate(mail.getMailTempate(), mail.getModel()));
             mimeMessageHelper.setText(mail.getMailContent(), true);
 

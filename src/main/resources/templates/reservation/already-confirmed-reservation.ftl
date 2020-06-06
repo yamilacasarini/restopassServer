@@ -18,7 +18,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <p class="lead mt-3">Ey, ${name}! Ya confirmaste esta reserva ${reservationId}.</p>
+                                    <p class="lead mt-3">Ey, ${name}! Ya confirmaste esta reserva</p>
                                     <hr class="my-4">
                                     <p>Puedes gestionar todas tus reservas a través de la app.</p>
                                 </div>

@@ -1,12 +1,19 @@
 package restopass.service;
 
+import io.jsonwebtoken.lang.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import restopass.dto.*;
+import restopass.dto.response.ReservationResponse;
+import restopass.dto.response.UserReservation;
+import restopass.exception.NoMoreVisitsException;
+import restopass.exception.ReservationAlreadyConfirmedException;
+import restopass.exception.ReservationCanceledException;
 import restopass.mongo.ReservationRepository;
 import restopass.utils.EmailSender;
 import restopass.utils.QRHelper;
@@ -15,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -59,7 +66,7 @@ public class ReservationService {
         reservation.setQrBase64(QRHelper.createQRBase64(reservationId, reservation.getRestaurantId(), userId));
 
         this.sendConfirmBookingEmail(reservation);
-        this.sendNewBookingEmail(reservation);
+        if(!CollectionUtils.isEmpty(reservation.getToConfirmUsers())) this.sendNewBookingEmail(reservation);
 
         this.reservationRepository.save(reservation);
     }
@@ -99,17 +106,18 @@ public class ReservationService {
         modelEmail.put("restaurantAddress", restaurant.getAddress());
 
         EmailModel emailModel = new EmailModel();
-        emailModel.setEmailTo(reservation.getOwnerUser());
         emailModel.setMailTempate("new_booking.html");
         emailModel.setSubject("Parece que tienes una nueva reserva");
         emailModel.setModel(modelEmail);
 
-        String toConfirmAddresses = String.join(",", reservation.getToConfirmUsers());
-
-        EmailSender.sendMultipleEmails(emailModel, toConfirmAddresses);
+        reservation.getToConfirmUsers().forEach(user -> {
+            modelEmail.put("joinUrl", this.buildJoinUrl(reservation.getReservationId(), user));
+            emailModel.setEmailTo(user);
+            EmailSender.sendEmail(emailModel);
+        });
     }
 
-    public List<Reservation> getReservationsForUser(String userId) {
+    public List<ReservationResponse> getReservationsForUser(String userId) {
         Query query = new Query();
 
 
@@ -120,30 +128,42 @@ public class ReservationService {
 
         query.addCriteria(orCriteria);
 
-        return this.mongoTemplate.find(query, Reservation.class);
+        List<Reservation> reservations = this.mongoTemplate.find(query, Reservation.class);
+        reservations.sort(Comparator.comparing(Reservation::getDate,
+                Comparator.nullsLast(Comparator.reverseOrder())));
+
+        return reservations.stream().map(r -> this.mapReservationToResponse(r, userId)).collect(Collectors.toList());
     }
 
-    public Reservation getReservationByAnyUser(String reservationId, String userId) {
-        Query query = new Query();
-
-        Criteria orCriteria = new Criteria();
-        orCriteria.orOperator(
-                Criteria.where(OWNER_USER_ID).is(userId),
-                Criteria.where(CONFIRMED_USERS).in(userId),
-                Criteria.where(TO_CONFIRM_USERS).in(userId));
-
-
-        query.addCriteria(Criteria.where(RESERVATION_ID).is(reservationId));
-        query.addCriteria(orCriteria);
-
-        return this.mongoTemplate.findOne(query, Reservation.class);
-    }
-
-    public void cancelReservation(String reservationId) {
+    public List<ReservationResponse> cancelReservation(String reservationId, String userId) {
         this.updateReservationState(reservationId, ReservationState.CANCELED);
+        return this.getReservationsForUser(userId);
     }
 
     public void confirmReservation(String reservationId, String userId) {
+        User user = this.userService.findById(userId);
+        Reservation reservation = this.findById(reservationId);
+
+        if(reservation.getState().equals(ReservationState.CANCELED)) {
+            throw new ReservationCanceledException();
+        }
+        if (user.getVisits() == null || (user.getVisits() != null && user.getVisits() == 0)) {
+            throw new NoMoreVisitsException();
+        }
+
+        if(reservation.getConfirmedUsers() != null && reservation.getConfirmedUsers().stream().anyMatch(u -> u.equalsIgnoreCase(userId))) {
+            throw new ReservationAlreadyConfirmedException();
+        }
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where(RESERVATION_ID).is(reservationId));
+
+        Update update = new Update();
+        update.pull(TO_CONFIRM_USERS, userId);
+        update.push(CONFIRMED_USERS, userId);
+
+        this.mongoTemplate.updateMulti(query, update, RESERVATION_COLLECTION);
+
         this.userService.decrementUserVisits(userId);
 
     }
@@ -248,7 +268,47 @@ public class ReservationService {
            hour = dt.getHour() + ":" + dt.getMinute();
         }
 
-        return dayName + " de " + monthName + "de " + dt.getYear() + " a las " + hour + "hs";
+        return Strings.capitalize(dayName) + " " + dt.getDayOfMonth() + " de " + Strings.capitalize(monthName) + " de " + dt.getYear() + " a las " + hour + "hs";
+    }
+
+    private String buildJoinUrl(String reservationId, String userId) {
+        return "https://restopass.herokuapp.com/reservations/confirm/" + reservationId + "/" + userId;
+    }
+
+    private ReservationResponse mapReservationToResponse(Reservation reservation, String userId) {
+        ReservationResponse response = new ReservationResponse();
+
+        response.setReservationId(reservation.getReservationId());
+        response.setRestaurantId(reservation.getRestaurantId());
+        response.setDate(reservation.getDate());
+        response.setQrBase64(reservation.getQrBase64());
+        response.setRestaurantAddress(reservation.getRestaurantAddress());
+        response.setRestaurantName(reservation.getRestaurantName());
+        response.setState(reservation.getState());
+        if (reservation.getConfirmedUsers() != null) response.setConfirmedUsers(reservation.getConfirmedUsers().stream().map(this::mapEmailToUserReservation).collect(Collectors.toList()));
+        if (reservation.getToConfirmUsers() != null) response.setToConfirmUsers(reservation.getToConfirmUsers().stream().map(this::mapEmailToUserReservation).collect(Collectors.toList()));
+        response.setOwnerUser(mapEmailToUserReservation(reservation.getOwnerUser()));
+        if(!reservation.getOwnerUser().equalsIgnoreCase(userId))response.setIsInvitation(true);
+
+        return response;
+    }
+
+    private UserReservation mapEmailToUserReservation(String userId) {
+        User user = this.userService.findById(userId);
+        UserReservation response = new UserReservation();
+
+        response.setUserId(userId);
+        response.setName(user.getName());
+        response.setLastName(user.getLastName());
+
+        return response;
+    }
+
+    public Reservation findById(String reservationId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(RESERVATION_ID).is(reservationId));
+
+        return this.mongoTemplate.findOne(query, Reservation.class);
     }
 
 }

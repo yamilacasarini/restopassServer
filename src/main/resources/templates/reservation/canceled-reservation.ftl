@@ -19,7 +19,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <p class="lead mt-3">La reserva ${reservationId} fue cancelada por <span class="font-weight-bold">${bookingOwner}</span>.</p>
+                                    <p class="lead mt-3">La reserva fue cancelada por su dueño.</p>
                                     <hr class="my-4">
                                     <p>
                                        No te preocupes! Puedes crear una nueva y gestionar todas tus reservas a través de la app.

@@ -16,6 +16,24 @@ public class Reservation {
     private String qrBase64;
     private List<String> confirmedUsers;
     private List<String> toConfirmUsers;
+    private String restaurantName;
+    private String restaurantAddress;
+
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+
+    public String getRestaurantAddress() {
+        return restaurantAddress;
+    }
+
+    public void setRestaurantAddress(String restaurantAddress) {
+        this.restaurantAddress = restaurantAddress;
+    }
 
     public String getQrBase64() {
         return qrBase64;

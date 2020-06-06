@@ -19,7 +19,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <p class="lead mt-3">No pudimos confirmar tu reserva por falta de visitas disponibles. No te preocupes! Guardaremos tu invitación</span>.</p>
+                                    <p class="lead mt-3">${msg}. No te preocupes! Guardaremos tu invitación</span>.</p>
                                     <hr class="my-4">
                                     <p>
                                        Puedes cancelar alguna reserva que no hayas asistido aún o conseguir un plan con mas visitas a través de la app.

@@ -11,7 +11,9 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), 1, "El usuario no existe"),
 
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(), 1, "Expired access token"),
-    EMPTY_VISITS(HttpStatus.UNAUTHORIZED.value(), 2, "Ups!, Alcanzaste el máximo de visitas permitidas para este mes. ¿Quieres seguir visitando tus restaurantes favoritos? Prueba un mejor plan");
+    EMPTY_VISITS(HttpStatus.UNAUTHORIZED.value(), 2, "¿Quieres seguir visitando tus restaurantes favoritos? Porque no pruebas un mejor plan"),
+    RESERVATION_ALREADY_CONFIRMED(HttpStatus.UNAUTHORIZED.value(), 3, "Reserva ya confirmada"),
+    RESERVATION_CANCELED(HttpStatus.UNAUTHORIZED.value(), 4, "Reserva cancelada por el dueño");
 
     private Integer status;
     private Integer code;

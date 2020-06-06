@@ -153,5 +153,7 @@ public class RestaurantService {
 
     public void fillRestaurantData(Reservation reservation) {
         Restaurant restaurant = this.findById(reservation.getRestaurantId());
+        reservation.setRestaurantAddress(restaurant.getAddress());
+        reservation.setRestaurantName(restaurant.getName());
     }
 }

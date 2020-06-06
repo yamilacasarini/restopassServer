@@ -14,8 +14,8 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col-12">
-                                    <h1>Hola, ${restaurantName}!</h1>
-                                    <p class="lead">Esta es una reserva</p>
+                                    <h1>Hola, Nombre Generico de Restaurante!</h1>
+                                    <p class="lead">Esta es una reserva valida de alguien</p>
                                     <hr class="my-4">
                                     <p>
                                         Los platos disponibles para esta reserva son:

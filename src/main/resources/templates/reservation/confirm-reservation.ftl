@@ -15,7 +15,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <h1>Genial, ${name}!</h1>
-                                    <p class="lead">Confirmaste la reserva ${reservationId}</p>
+                                    <p class="lead">Confirmaste la reserva</p>
                                     <hr class="my-4">
                                     <p>
                                         Te enviamos un email con el código QR a

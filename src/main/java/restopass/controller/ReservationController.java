@@ -4,10 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import restopass.dto.Reservation;
+import restopass.dto.User;
+import restopass.dto.response.ReservationResponse;
+import restopass.exception.NoMoreVisitsException;
+import restopass.exception.ReservationAlreadyConfirmedException;
+import restopass.exception.ReservationCanceledException;
 import restopass.service.ReservationService;
+import restopass.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -16,6 +21,8 @@ public class ReservationController {
 
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private UserService userService;
 
     private String USER_ID = "userId";
 
@@ -26,18 +33,19 @@ public class ReservationController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<Reservation> getReservationByUser(HttpServletRequest request) {
+    public List<ReservationResponse> getReservationByUser(HttpServletRequest request) {
         String userId = request.getAttribute(USER_ID).toString();
         return this.reservationService.getReservationsForUser(userId);
     }
 
     @RequestMapping(value = "/cancel/{reservationId}", method = RequestMethod.PATCH)
-    public void cancelReservation(@PathVariable String reservationId) {
-        this.reservationService.cancelReservation(reservationId);
+    public List<ReservationResponse> cancelReservation(@PathVariable String reservationId, HttpServletRequest request) {
+        String userId = request.getAttribute(USER_ID).toString();
+        return this.reservationService.cancelReservation(reservationId, userId);
     }
 
 
-    @RequestMapping(value = "/done/{reservationId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/done/{reservationId}", method = RequestMethod.GET)
     public ModelAndView doneReservation(@PathVariable String reservationId,
                                 @RequestParam(value = "restaurant_id") String restaurantId,
                                 @RequestParam(value = "user_id") String userId) {
@@ -48,23 +56,29 @@ public class ReservationController {
     }
 
     @RequestMapping(value = "/confirm/{reservationId}/{userId}", method = RequestMethod.GET)
-    public ModelAndView confirmReservation(@PathVariable String reservationId, @PathVariable String userId) throws IOException {
-        //TODO validar que ya no sea un usuario confirmado (Osea que este en la lista confirmedUsers de la reserva).
-        //TODO mover al usuario de la list toConfirmUsers a confirmedUsers en la reserva, descontarle una visita y mandar mail con QR
-        //TODO si ya tenia las visitas en cero porque o acepto otra invitacion o hizo el otra reserva, mostrar error y pedirle que cancele alguna
-       // this.reservationService.confirmReservation(reservationId, userId);\
-
+    public ModelAndView confirmReservation(@PathVariable String reservationId, @PathVariable String userId) {
         ModelAndView modelAndView = new ModelAndView();
-        //Reservation reservation = reservationService.getReservationByAnyUser(reservationId, userId);
-//        if (reservation == null) {
-            modelAndView.setViewName("/reservation/no-more-visits");
-//        }
+        User user;
 
-        modelAndView.addObject("name", "Juan");
-        modelAndView.addObject("reservationId", "17384");
-        modelAndView.addObject("email", "prueba@prueba.com");
-        modelAndView.addObject("bookingOwner", "cancelador@prueba.com");
-        //modelAndView.setViewName("confirm-reservation");
+        try {
+            this.reservationService.confirmReservation(reservationId, userId);
+            user = this.userService.findById(userId);
+            modelAndView.addObject("name", user.getName());
+            modelAndView.addObject("email", user.getEmail());
+            modelAndView.setViewName("/reservation/confirm-reservation");
+        } catch (NoMoreVisitsException e) {
+            modelAndView.addObject("msg", e.getMessage());
+            modelAndView.setViewName("/reservation/no-more-visits");
+        } catch (ReservationAlreadyConfirmedException e) {
+            user = this.userService.findById(userId);
+            modelAndView.addObject("name", user.getName());
+            modelAndView.setViewName("/reservation/already-confirmed-reservation");
+        } catch (ReservationCanceledException e) {
+            modelAndView.setViewName("/reservation/canceled-reservation");
+        } catch (Exception e) {
+            modelAndView.setViewName("/reservation/error-reservation");
+        }
+
         return modelAndView;
     }
 

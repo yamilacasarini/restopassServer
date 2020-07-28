@@ -7,6 +7,12 @@ public class UserLoginResponse<T> {
     private T user;
     private boolean isCreation;
 
+    public UserLoginResponse(String xAuthToken, String xRefreshToken, T user) {
+        this.xAuthToken = xAuthToken;
+        this.xRefreshToken = xRefreshToken;
+        this.user = user;
+    }
+
     public boolean isCreation() {
         return isCreation;
     }

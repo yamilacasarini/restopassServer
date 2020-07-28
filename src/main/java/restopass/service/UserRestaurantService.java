@@ -5,7 +5,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import restopass.dto.Restaurant;
 import restopass.dto.UserRestaurant;
+import restopass.dto.request.UserLoginRequest;
+import restopass.dto.response.UserLoginResponse;
+import restopass.dto.response.UserRestaurantResponse;
 import restopass.exception.UserAlreadyExistsException;
 import restopass.mongo.UserRestaurantRepository;
 import restopass.service.GenericUserService;
@@ -18,6 +22,8 @@ public class UserRestaurantService extends GenericUserService {
     @Autowired
     private UserRestaurantRepository userRestaurantRepository;
     @Autowired
+    private RestaurantService restaurantService;
+    @Autowired
     private MongoTemplate mongoTemplate;
 
     public void createUserRestaurant(UserRestaurant userRestaurant) {
@@ -26,6 +32,11 @@ public class UserRestaurantService extends GenericUserService {
         }
 
         this.userRestaurantRepository.save(userRestaurant);
+    }
+
+    public UserRestaurantResponse loginRestaurantUser(UserLoginRequest userLoginRequest) {
+        UserLoginResponse<UserRestaurant> user = this.loginUser(userLoginRequest);
+        return new UserRestaurantResponse(user, this.restaurantService.findById(user.getUser().getRestaurantId()));
     }
 
     public void deleteUserRestaurant(String userId) {

@@ -1,12 +1,10 @@
 package restopass.dto.response;
 
-import restopass.dto.User;
-
-public class UserLoginResponse {
+public class UserLoginResponse<T> {
 
     private String xAuthToken;
     private String xRefreshToken;
-    private User user;
+    private T user;
     private boolean isCreation;
 
     public boolean isCreation() {
@@ -33,11 +31,11 @@ public class UserLoginResponse {
         this.xRefreshToken = xRefreshToken;
     }
 
-    public User getUser() {
+    public T getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(T user) {
         this.user = user;
     }
 }

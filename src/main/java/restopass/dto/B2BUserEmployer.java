@@ -3,7 +3,6 @@ package restopass.dto;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Document(collection = "b2b_users")

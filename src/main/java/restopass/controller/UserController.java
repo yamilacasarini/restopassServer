@@ -22,17 +22,17 @@ public class UserController {
     private String USER_ID_ATTR = "userId";
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public UserLoginResponse userLogin(@RequestBody UserLoginRequest user) {
+    public  UserLoginResponse<User> userLogin(@RequestBody UserLoginRequest user) {
         return userService.loginUser(user);
     }
 
     @RequestMapping(value = "/login/google", method = RequestMethod.POST)
-    public UserLoginResponse userLoginGoogle(@RequestBody UserLoginGoogleRequest user) {
+    public  UserLoginResponse<User> userLoginGoogle(@RequestBody UserLoginGoogleRequest user) {
         return userService.loginGoogleUser(user);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public UserLoginResponse createUser(@RequestBody UserCreationRequest user) {
+    public  UserLoginResponse<User> createUser(@RequestBody UserCreationRequest user) {
         return this.userService.createUser(user);
     }
 
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.GET)
-    public UserLoginResponse refreshToken(HttpServletRequest request) {
+    public UserLoginResponse<User> refreshToken(HttpServletRequest request) {
         return this.userService.refreshToken(request);
     }
 

@@ -12,6 +12,8 @@ import java.util.Date;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
+import restopass.exception.InvalidAccessOrRefreshTokenException;
+import restopass.dto.response.UserLoginResponse;
 
 @Service
 public class JWTHelper {
@@ -58,9 +60,40 @@ public class JWTHelper {
 
     public static Claims decodeJWT(String jwt) {
         //This line will throw an exception if it is not a signed JWS (as expected)
-        Claims claims = Jwts.parser()
+        return Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
                 .parseClaimsJws(jwt).getBody();
-        return claims;
     }
+
+    public static <T> UserLoginResponse<T> refreshToken(String oldAccessToken, String emailRefresh, T user) {
+
+
+        try {
+            Claims claims = JWTHelper.decodeJWT(oldAccessToken);
+            if (claims.getId().equalsIgnoreCase(emailRefresh)) {
+                return JWTHelper.buildUserLoginResponse(user, emailRefresh, false);
+            } else {
+                throw new InvalidAccessOrRefreshTokenException();
+            }
+        } catch (ExpiredJwtException e) {
+            if (e.getClaims().getId().equalsIgnoreCase(emailRefresh)) {
+                return JWTHelper.buildUserLoginResponse(user, emailRefresh, false);
+            } else {
+                throw new InvalidAccessOrRefreshTokenException();
+            }
+        } catch (Exception e) {
+            throw new InvalidAccessOrRefreshTokenException();
+        }
+    }
+
+    public static <T> UserLoginResponse<T> buildUserLoginResponse(T user, String emailRefresh, Boolean isCreation) {
+        UserLoginResponse<T> userResponse = new  UserLoginResponse<>();
+        userResponse.setxAuthToken(JWTHelper.createAccessToken(emailRefresh));
+        userResponse.setxRefreshToken(JWTHelper.createRefreshToken(emailRefresh));
+        userResponse.setUser(user);
+        userResponse.setCreation(isCreation);
+        return userResponse;
+    }
+
+
 }

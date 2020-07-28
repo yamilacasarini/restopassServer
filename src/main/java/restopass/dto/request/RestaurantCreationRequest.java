@@ -1,6 +1,5 @@
 package restopass.dto.request;
 
-import restopass.dto.Dish;
 import restopass.dto.RestaurantHours;
 
 import java.util.List;

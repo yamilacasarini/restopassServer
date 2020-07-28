@@ -1,8 +1,5 @@
 package restopass.dto.response;
 
-import restopass.dto.Membership;
-import restopass.dto.Restaurant;
-
 import java.util.List;
 
 public class MembershipsResponse {

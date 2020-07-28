@@ -2,7 +2,6 @@ package restopass.utils;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
-import restopass.dto.MembershipType;
 
 import java.time.LocalDateTime;
 

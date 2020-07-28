@@ -1,7 +1,5 @@
 package restopass.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Service;
 import restopass.dto.*;
 import restopass.dto.request.UserCreationRequest;
 import restopass.dto.request.UserLoginGoogleRequest;
-import restopass.dto.request.UserLoginRequest;
 import restopass.dto.request.UserUpdateRequest;
 import restopass.dto.response.UserLoginResponse;
 import restopass.exception.*;
@@ -24,11 +21,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService extends GenericUserService {
 
     private static String EMAIL_FIELD = "email";
-    private static String SECONDARY_EMAILS_FIELD = "secondaryEmails";
     private static String PASSWORD_FIELD = "password";
+    private static String SECONDARY_EMAILS_FIELD = "secondaryEmails";
     private static String NAME_FIELD = "name";
     private static String LAST_NAME_FIELD = "lastName";
     private static String VISITS_FIELD = "visits";
@@ -56,33 +53,23 @@ public class UserService {
         this.googleService = googleService;
     }
 
-    public UserLoginResponse loginUser(UserLoginRequest user) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where(EMAIL_FIELD).is(user.getEmail()));
-        query.addCriteria(Criteria.where(PASSWORD_FIELD).is(user.getPassword()));
-
-        User userDTO = this.mongoTemplate.findOne(query, User.class);
-
-        if (userDTO == null) {
-            throw new InvalidUsernameOrPasswordException();
-        }
-
-        return this.buildUserLoginResponse(userDTO, false);
+    public User findByUserAndPass(Query query) {
+        return this.mongoTemplate.findOne(query, User.class);
     }
 
-    public UserLoginResponse loginGoogleUser(UserLoginGoogleRequest userRequest) {
+    public UserLoginResponse<User> loginGoogleUser(UserLoginGoogleRequest userRequest) {
         User newUser = googleService.verifyGoogleToken(userRequest.getGoogleToken());
         User userDB = this.findById(newUser.getEmail());
 
         if (userDB == null) {
             userRepository.save(newUser);
-            return this.buildUserLoginResponse(newUser, true);
+            return JWTHelper.buildUserLoginResponse(newUser, newUser.getEmail(),true);
         } else {
-            return this.buildUserLoginResponse(userDB, false);
+            return JWTHelper.buildUserLoginResponse(userDB, userDB.getEmail(),false);
         }
     }
 
-    public UserLoginResponse createUser(UserCreationRequest user) {
+    public  UserLoginResponse<User> createUser(UserCreationRequest user) {
         User userDTO = new User(user.getEmail(), user.getPassword(), user.getName(), user.getLastName());
         B2BUserEmployer b2BUserEmployer = this.b2bUserService.checkIfB2BUser(user.getEmail());
 
@@ -92,35 +79,9 @@ public class UserService {
 
         try {
             userRepository.save(userDTO);
-            return this.buildUserLoginResponse(userDTO, true);
+            return JWTHelper.buildUserLoginResponse(userDTO, userDTO.getEmail(),true);
         } catch (DuplicateKeyException e) {
             throw new UserAlreadyExistsException();
-        }
-    }
-
-    public UserLoginResponse refreshToken(HttpServletRequest req) {
-
-        String oldAccessToken = req.getHeader(ACCESS_TOKEN_HEADER);
-        String refreshAccessToken = req.getHeader(REFRESH_TOKEN_HEADER);
-
-        String emailRefresh = JWTHelper.decodeJWT(refreshAccessToken).getId();
-        User userDTO = this.findById(emailRefresh);
-
-        try {
-            Claims claims = JWTHelper.decodeJWT(oldAccessToken);
-            if (claims.getId().equalsIgnoreCase(emailRefresh)) {
-                return this.buildUserLoginResponse(userDTO, false);
-            } else {
-                throw new InvalidAccessOrRefreshTokenException();
-            }
-        } catch (ExpiredJwtException e) {
-            if (e.getClaims().getId().equalsIgnoreCase(emailRefresh)) {
-                return this.buildUserLoginResponse(userDTO, false);
-            } else {
-                throw new InvalidAccessOrRefreshTokenException();
-            }
-        } catch (Exception e) {
-            throw new InvalidAccessOrRefreshTokenException();
         }
     }
 
@@ -182,14 +143,16 @@ public class UserService {
         return membershipFinalizeDate;
     }
 
-    private UserLoginResponse buildUserLoginResponse(User user, Boolean isCreation) {
-        UserLoginResponse userResponse = new UserLoginResponse();
-        userResponse.setxAuthToken(JWTHelper.createAccessToken(user.getEmail()));
-        userResponse.setxRefreshToken(JWTHelper.createRefreshToken(user.getEmail()));
-        userResponse.setUser(user);
-        userResponse.setCreation(isCreation);
-        return userResponse;
+    public UserLoginResponse<User> refreshToken(HttpServletRequest req) {
+        String refreshAccessToken = req.getHeader(REFRESH_TOKEN_HEADER);
+        String oldAccessToken = req.getHeader(ACCESS_TOKEN_HEADER);
+
+        String emailRefresh = JWTHelper.decodeJWT(refreshAccessToken).getId();
+        User user = this.findById(emailRefresh);
+
+        return JWTHelper.refreshToken(oldAccessToken, emailRefresh, user);
     }
+
 
     public void addNewRestaurantFavorite(String restaurantId, String userId) {
         Query query = new Query();

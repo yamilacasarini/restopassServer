@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import restopass.dto.UserRestaurant;
 import restopass.dto.request.UserLoginRequest;
-import restopass.dto.response.UserRestaurantResponse;
+import restopass.dto.response.UserLoginResponse;
 import restopass.service.UserRestaurantService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class UserRestaurantController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public UserRestaurantResponse userLogin(@RequestBody UserLoginRequest user) {
+    public UserLoginResponse<UserRestaurant> userLogin(@RequestBody UserLoginRequest user) {
         return userRestaurantService.loginRestaurantUser(user);
     }
 

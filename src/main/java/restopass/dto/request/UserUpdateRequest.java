@@ -5,7 +5,7 @@ public class UserUpdateRequest {
     private String name;
     private String lastName;
     private String password;
-    private String secondaryEmail;
+    private String toConfirmEmail;
 
     public String getName() {
         return name;
@@ -31,11 +31,11 @@ public class UserUpdateRequest {
         this.password = password;
     }
 
-    public String getSecondaryEmail() {
-        return secondaryEmail;
+    public String getToConfirmEmail() {
+        return toConfirmEmail;
     }
 
-    public void setSecondaryEmail(String secondaryEmail) {
-        this.secondaryEmail = secondaryEmail;
+    public void setToConfirmEmail(String toConfirmEmail) {
+        this.toConfirmEmail = toConfirmEmail;
     }
 }

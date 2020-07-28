@@ -69,7 +69,7 @@ public class ReservationService {
 
         reservation.setQrBase64(QRHelper.createQRBase64(reservationId, reservation.getRestaurantId(), userId));
 
-        this.sendConfirmBookingEmail(reservation);
+        this.sendConfirmBookingEmail(reservation, userId);
         if (!CollectionUtils.isEmpty(reservation.getToConfirmUsers())) {
             this.sendNewBookingEmail(reservation);
             this.sendNewBookingNotif(reservation);
@@ -86,9 +86,11 @@ public class ReservationService {
                 this.generateHumanDate(reservation.getDate()));
     }
 
-    private void sendConfirmBookingEmail(Reservation reservation) {
+    private void sendConfirmBookingEmail(Reservation reservation, String userId) {
         User user = this.userService.findById(reservation.getOwnerUser());
         Restaurant restaurant = this.restaurantService.findById(reservation.getRestaurantId());
+
+        Boolean isOwner = userId.equals(user.getEmail());
 
         HashMap<String, Object> modelEmail = new HashMap<>();
         modelEmail.put("userName", user.getName());
@@ -98,15 +100,29 @@ public class ReservationService {
         modelEmail.put("restaurantAddress", restaurant.getAddress());
         modelEmail.put("qrCode", reservation.getQrBase64());
         modelEmail.put("cancelDate", this.generateHumanDate(reservation.getDate().minusHours(restaurant.getHoursToCancel())));
-
+        modelEmail.put("isOwner", isOwner);
 
         EmailModel emailModel = new EmailModel();
-        emailModel.setEmailTo(reservation.getOwnerUser());
-        emailModel.setMailTempate("confirm_booking.html");
+        emailModel.setMailTempate("confirm_booking.ftl");
         emailModel.setSubject("Tu reserva ha sido confirmada");
         emailModel.setModel(modelEmail);
 
+        if (isOwner) {
+            this.sendMultiEmail(user, emailModel);
+        } else {
+            emailModel.setEmailTo(userId);
+            EmailSender.sendEmail(emailModel);
+        }
+
+    }
+
+    private void sendMultiEmail(User user, EmailModel emailModel) {
+        emailModel.setEmailTo(user.getEmail());
         EmailSender.sendEmail(emailModel);
+        user.getSecondaryEmails().forEach(email -> {
+            emailModel.setEmailTo(email);
+            EmailSender.sendEmail(emailModel);
+        });
     }
 
     private void sendNewBookingEmail(Reservation reservation) {
@@ -125,10 +141,11 @@ public class ReservationService {
         emailModel.setSubject("Parece que tienes una nueva reserva");
         emailModel.setModel(modelEmail);
 
-        reservation.getToConfirmUsers().forEach(user -> {
-            modelEmail.put("joinUrl", this.buildJoinUrl(reservation.getReservationId(), user));
-            emailModel.setEmailTo(user);
-            EmailSender.sendEmail(emailModel);
+        reservation.getToConfirmUsers().forEach(userEmail -> {
+            modelEmail.put("joinUrl", this.buildJoinUrl(reservation.getReservationId(), userEmail));
+
+            User user = userService.findById(userEmail);
+            this.sendMultiEmail(user, emailModel);
         });
     }
 
@@ -208,8 +225,8 @@ public class ReservationService {
         this.mongoTemplate.updateMulti(query, update, RESERVATION_COLLECTION);
     }
 
-    public void confirmReservation(String reservationId, String userId) {
-        User user = this.userService.findById(userId);
+    public void confirmReservation(String reservationId, String email) {
+        User user = this.userService.findById(email);
         Reservation reservation = this.findById(reservationId);
         Restaurant restaurant = this.restaurantService.findById(reservation.getRestaurantId());
 
@@ -220,7 +237,7 @@ public class ReservationService {
             throw new NoMoreVisitsException();
         }
 
-        if (reservation.getConfirmedUsers() != null && reservation.getConfirmedUsers().stream().anyMatch(u -> u.equalsIgnoreCase(userId))) {
+        if (reservation.getConfirmedUsers() != null && reservation.getConfirmedUsers().stream().anyMatch(u -> u.equalsIgnoreCase(email))) {
             throw new ReservationAlreadyConfirmedException();
         }
 
@@ -228,15 +245,16 @@ public class ReservationService {
         query.addCriteria(Criteria.where(RESERVATION_ID).is(reservationId));
 
         Update update = new Update();
-        update.pull(TO_CONFIRM_USERS, userId);
-        update.push(CONFIRMED_USERS, userId);
+        update.pull(TO_CONFIRM_USERS, email);
+        update.push(CONFIRMED_USERS, email);
 
         this.mongoTemplate.updateMulti(query, update, RESERVATION_COLLECTION);
 
+        this.sendConfirmBookingEmail(reservation, email);
         this.firebaseService.sendConfirmedInvitationNotification(reservation.getOwnerUser(), reservationId,
                 user.getName() + " " + user.getLastName(), restaurant.getName(),
                 this.generateHumanDate(reservation.getDate()));
-        this.userService.decrementUserVisits(userId);
+        this.userService.decrementUserVisits(email);
 
     }
 

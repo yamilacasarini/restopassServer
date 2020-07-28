@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import restopass.dto.UserRestaurant;
 import restopass.dto.request.UserLoginRequest;
 import restopass.dto.response.UserLoginResponse;
+import restopass.service.UserRestaurantService;
 
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/restaurant/users")
+@RequestMapping("/users/restaurants")
 public class UserRestaurantController {
 
     @Autowired

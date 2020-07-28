@@ -14,6 +14,8 @@ public enum ErrorCode {
     RESERVATION_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), 9, "Reserva ya confirmada"),
     RESERVATION_CANCELED(HttpStatus.BAD_REQUEST.value(), 10, "Reserva cancelada por el dueño"),
     RESERVATION_CANCEL_TIME_EXPIRED(HttpStatus.BAD_REQUEST.value(), 11, "Se excedió el tiempo para cancelar la reserva. Lamentablemente el restaurante no acepta tu cancelación"),
+    EMAIL_ALREADY_ADDED(HttpStatus.BAD_REQUEST.value(), 12, "Ya agregaste este email"),
+    FOREIGN_EMAIL_ADDED(HttpStatus.BAD_REQUEST.value(), 13, "Parece que otro usuario ya tiene este email"),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), 1, "El usuario no esta registrado en RestoPass"),
     URL_NOT_FOUND(HttpStatus.NOT_FOUND.value(), 2, "Url doesnt exist. Please check our wiki for more info"),

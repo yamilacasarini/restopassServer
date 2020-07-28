@@ -130,13 +130,17 @@ a[x-apple-data-detectors] {
                <table width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;"> 
                  <tr style="border-collapse:collapse;"> 
                   <td width="600" valign="top" align="center" style="padding:0;Margin:0;"> 
-                   <table style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;" width="100%" cellspacing="0" cellpadding="0" bgcolor="#ffffff" role="presentation"> 
+                   <table style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;" width="100%" cellspacing="0" cellpadding="0" bgcolor="#ffffff" role="presentation">
+
                      <tr style="border-collapse:collapse;"> 
                       <td class="es-m-txt-l" bgcolor="#ffffff" align="left" style="Margin:0;padding-bottom:15px;padding-top:20px;padding-left:30px;padding-right:30px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">¡Genial ${userName}! Gracias por elegirnos para vivir una experiencia única. A continuación te dejamos los detalles de tu reserva y el código QR para validar la misma, solo muéstrasela al mozo cuando llegues y ¡A&nbsp;disfrutar!</p></td>
-                     </tr> 
+                     </tr>
+                       <#if isOwner>
                      <tr style="border-collapse:collapse;"> 
                       <td class="es-m-txt-l" bgcolor="#ffffff" align="left" style="Margin:0;padding-bottom:15px;padding-top:20px;padding-left:30px;padding-right:30px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:18px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:27px;color:#666666;">Si decidiste ir acompañado con otros usuarios de RestoPass, les estará llegando un mail para pedir su confirmación,&nbsp;si no aceptan sumarse no serán considerados parte de esta reserva.</p></td> 
-                     </tr> 
+                     </tr>
+                       </#if>
+
                      <tr style="border-collapse:collapse;"> 
                       <td class="es-m-txt-l" bgcolor="#ffffff" align="center" style="Margin:0;padding-bottom:5px;padding-top:20px;padding-left:30px;padding-right:30px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-size:20px;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;line-height:30px;color:#3700B3;">${restaurantName}</p></td>
                      </tr> 

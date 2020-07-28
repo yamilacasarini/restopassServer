@@ -2,6 +2,7 @@ package restopass.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import restopass.dto.User;
 import restopass.dto.request.UserCreationRequest;
 import restopass.dto.request.UserLoginGoogleRequest;
@@ -36,6 +37,12 @@ public class UserController {
         return this.userService.createUser(user);
     }
 
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public User getUser(HttpServletRequest request) {
+        String userId = request.getAttribute(USER_ID_ATTR).toString();
+        return this.userService.findById(userId);
+    }
+
     @RequestMapping(value = "", method = RequestMethod.PATCH)
     public void updateUser(HttpServletRequest request, @RequestBody UserUpdateRequest userUpdateRequest) {
         String userId = request.getAttribute(USER_ID_ATTR).toString();
@@ -62,5 +69,31 @@ public class UserController {
     @RequestMapping(value = "/check/{userId}/{baseMembership}", method = RequestMethod.POST)
     public User checkCanAddToReservation(@PathVariable String userId, @PathVariable Integer baseMembership) {
         return this.userService.checkCanAddToReservation(userId, baseMembership);
+    }
+
+    @RequestMapping(value = "/emails", method = RequestMethod.PATCH)
+    public void addToConfirmEmail(HttpServletRequest request, @RequestBody UserUpdateRequest userUpdateRequest) {
+        String userId = request.getAttribute(USER_ID_ATTR).toString();
+        this.userService.updateUserInfo(userUpdateRequest, userId);
+    }
+
+    @RequestMapping(value = "/emails/{email}", method = RequestMethod.DELETE)
+    public void removeEmail(HttpServletRequest request, @PathVariable String email) {
+        String userId = request.getAttribute(USER_ID_ATTR).toString();
+        this.userService.removeEmail(email, userId);
+    }
+
+    @RequestMapping(value = "/emails/confirm/{email}/{userId}", method = RequestMethod.GET)
+    public ModelAndView confirmEmail(@PathVariable String email, @PathVariable  String userId) {
+        this.userService.confirmEmail(email, userId);
+
+        ModelAndView modelAndView = new ModelAndView();
+
+        User user = this.userService.findById(userId);
+        modelAndView.addObject("name", user.getName());
+        modelAndView.addObject("email", email);
+        modelAndView.setViewName("/confirmEmail/confirm-email-success");
+
+        return modelAndView;
     }
 }

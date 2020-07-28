@@ -3,6 +3,7 @@ package restopass.dto;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +15,8 @@ public class User extends GenericUser {
     private CreditCard creditCard;
     private Integer visits;
     private Integer actualMembership;
-    private List<String> secondaryEmails;
+    private Set<String> secondaryEmails = new HashSet<>();
+    private Set<String> toConfirmEmails = new HashSet<>();
     private Set<String> favoriteRestaurants;
     private B2BUserEmployee b2BUserEmployee;
     private LocalDateTime membershipFinalizeDate;
@@ -54,11 +56,11 @@ public class User extends GenericUser {
         this.favoriteRestaurants = favoriteRestaurants;
     }
 
-    public List<String> getSecondaryEmails() {
+    public Set<String> getSecondaryEmails() {
         return secondaryEmails;
     }
 
-    public void setSecondaryEmails(List<String> secondaryEmails) {
+    public void setSecondaryEmails(Set<String> secondaryEmails) {
         this.secondaryEmails = secondaryEmails;
     }
 
@@ -109,4 +111,13 @@ public class User extends GenericUser {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    public Set<String> getToConfirmEmails() {
+        return toConfirmEmails;
+    }
+
+    public void setToConfirmEmails(Set<String> toConfirmEmails) {
+        this.toConfirmEmails = toConfirmEmails;
+    }
+
 }

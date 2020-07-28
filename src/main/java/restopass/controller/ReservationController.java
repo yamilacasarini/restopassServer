@@ -72,22 +72,22 @@ public class ReservationController {
         return this.reservationService.getReservationsForUser(userId);
     }
 
-    @RequestMapping(value = "/confirm/{reservationId}/{userId}", method = RequestMethod.GET)
-    public ModelAndView confirmReservation(@PathVariable String reservationId, @PathVariable String userId) {
+    @RequestMapping(value = "/confirm/{reservationId}/{email}", method = RequestMethod.GET)
+    public ModelAndView confirmReservation(@PathVariable String reservationId, @PathVariable String email) {
         ModelAndView modelAndView = new ModelAndView();
         User user;
 
         try {
-            this.reservationService.confirmReservation(reservationId, userId);
-            user = this.userService.findById(userId);
+            this.reservationService.confirmReservation(reservationId, email);
+            user = this.userService.findById(email);
             modelAndView.addObject("name", user.getName());
-            modelAndView.addObject("email", user.getEmail());
+            modelAndView.addObject("email", email);
             modelAndView.setViewName("/reservation/confirm-reservation");
         } catch (NoMoreVisitsException e) {
             modelAndView.addObject("msg", e.getMessage());
             modelAndView.setViewName("/reservation/no-more-visits");
         } catch (ReservationAlreadyConfirmedException e) {
-            user = this.userService.findById(userId);
+            user = this.userService.findById(email);
             modelAndView.addObject("name", user.getName());
             modelAndView.setViewName("/reservation/already-confirmed-reservation");
         } catch (ReservationCanceledException e) {

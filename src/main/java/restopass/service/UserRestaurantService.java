@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import restopass.dto.Dish;
 import restopass.dto.Restaurant;
 import restopass.dto.UserRestaurant;
@@ -16,7 +15,6 @@ import restopass.mongo.UserRestaurantRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
-import java.util.List;
 
 
 @Service

@@ -1,5 +1,6 @@
 package restopass.service;
 
+import com.google.api.gax.tracing.TracedOperationCallable;
 import io.jsonwebtoken.lang.Strings;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import restopass.dto.*;
@@ -389,6 +389,27 @@ public class ReservationService {
         query.addCriteria(Criteria.where(RESERVATION_ID).is(reservationId));
 
         return this.mongoTemplate.findOne(query, Reservation.class);
+    }
+
+    public void deleteUserReservations(String userId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(CONFIRMED_USERS).in(userId));
+        Update update = new Update();
+        update.pull(CONFIRMED_USERS, userId);
+
+        this.mongoTemplate.updateMulti(query, update, RESERVATION_COLLECTION);
+
+        query = new Query();
+        query.addCriteria(Criteria.where(TO_CONFIRM_USERS).in(userId));
+        update = new Update();
+        update.pull(TO_CONFIRM_USERS, userId);
+
+        this.mongoTemplate.updateMulti(query, update, RESERVATION_COLLECTION);
+
+        query = new Query();
+        query.addCriteria(Criteria.where(OWNER_USER_ID).is(userId));
+
+        this.mongoTemplate.remove(query, RESERVATION_COLLECTION);
     }
 
 }

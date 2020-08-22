@@ -4,7 +4,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Document(collection = "users")
@@ -21,6 +20,7 @@ public class User extends GenericUser {
     private B2BUserEmployee b2BUserEmployee;
     private LocalDateTime membershipFinalizeDate;
     private LocalDateTime membershipEnrolledDate;
+    private String recoverPasswordToken;
 
     public User() {
         super();
@@ -120,4 +120,12 @@ public class User extends GenericUser {
         this.toConfirmEmails = toConfirmEmails;
     }
 
+
+    public String getRecoverPasswordToken() {
+        return recoverPasswordToken;
+    }
+
+    public void setRecoverPasswordToken(String recoverPasswordToken) {
+        this.recoverPasswordToken = recoverPasswordToken;
+    }
 }

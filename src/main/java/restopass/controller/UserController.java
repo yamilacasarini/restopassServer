@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import restopass.dto.User;
-import restopass.dto.request.UserCreationRequest;
-import restopass.dto.request.UserLoginGoogleRequest;
-import restopass.dto.request.UserLoginRequest;
-import restopass.dto.request.UserUpdateRequest;
+import restopass.dto.request.*;
 import restopass.dto.response.UserLoginResponse;
 import restopass.service.UserService;
 
@@ -102,4 +99,24 @@ public class UserController {
 
         return modelAndView;
     }
+
+    @RequestMapping(value = "/recover-password", method = RequestMethod.POST)
+    public void recoverPassword(@RequestBody RecoverPasswordRequest recoverPasswordRequest) {
+        this.userService.recoverPassword(recoverPasswordRequest.getEmail());
+    }
+
+    @RequestMapping(value = "/recover-password/verify", method = RequestMethod.POST)
+    public void recoverPassword(@RequestBody VerifyRecoverPasswordRequest recoverPasswordRequest) {
+        this.userService.verifyRecoverPassword(recoverPasswordRequest.getEmail(), recoverPasswordRequest.getToken());
+    }
+
+    @RequestMapping(value = "/password", method = RequestMethod.PATCH)
+    public void changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+        userUpdateRequest.setPassword(changePasswordRequest.getPassword());
+        this.userService.updateUserInfo(userUpdateRequest, changePasswordRequest.getEmail());
+    }
+
+
+
 }

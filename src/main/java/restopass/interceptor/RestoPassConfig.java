@@ -20,7 +20,7 @@ public class RestoPassConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor).addPathPatterns("/**").excludePathPatterns("/users/login", "/users/refresh", "/users/restaurants/refresh", "/users/restaurants/login");
+        registry.addInterceptor(authInterceptor).addPathPatterns("/**").excludePathPatterns("/users", "/users/login/**", "/users/refresh", "/users/restaurants/refresh", "/users/restaurants/login", "/users/recover-password/**", "/users/password");
     }
 
     @Bean

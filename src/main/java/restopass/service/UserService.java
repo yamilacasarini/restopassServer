@@ -90,11 +90,18 @@ public class UserService extends GenericUserService {
         }
     }
 
-    public void deleteUser(String userId) {
-        this.reservationService.deleteUserReservations(userId);
-
+    public void deleteUser(String userId, String pass) {
         Query query = new Query();
         query.addCriteria(Criteria.where(EMAIL_FIELD).is(userId));
+        query.addCriteria(Criteria.where(PASSWORD_FIELD).is(pass));
+
+        User user = this.findByUserAndPass(query);
+
+        if(user != null) {
+            throw new DeleteUserBadPasswordException();
+        }
+
+        this.reservationService.deleteUserReservations(userId);
 
         this.mongoTemplate.remove(query, USER_COLLECTION);
     }

@@ -29,7 +29,7 @@ public class UserController {
         return userService.loginGoogleUser(user);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public  UserLoginResponse<User> createUser(@RequestBody UserCreationRequest user) {
         return this.userService.createUser(user);
     }

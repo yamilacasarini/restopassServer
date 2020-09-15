@@ -62,7 +62,7 @@ public class RestaurantController {
 
     @RequestMapping(value = "", method = RequestMethod.PUT)
     public List<Restaurant> getRestaurantByTags(@RequestBody RestaurantTagsRequest request) {
-        return this.restaurantService.getByTags(request.getLat(), request.getLng(), request.getTags(), request.getTopMembership(), request.getFreeText());
+        return this.restaurantService.getByTags(request.getLat(), request.getLng(), request.getRadius(), request.getTags(), request.getTopMembership(), request.getFreeText());
     }
 
     @RequestMapping(value = "/tags", method = RequestMethod.GET)

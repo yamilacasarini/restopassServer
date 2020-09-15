@@ -6,6 +6,7 @@ public class RestaurantTagsRequest {
 
     private Double lat;
     private Double lng;
+    private Double radius;
     private String freeText;
     private List<String> tags;
     private Integer topMembership;
@@ -48,5 +49,13 @@ public class RestaurantTagsRequest {
 
     public void setLng(Double lng) {
         this.lng = lng;
+    }
+
+    public Double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(Double radius) {
+        this.radius = radius;
     }
 }

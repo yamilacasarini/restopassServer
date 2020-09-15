@@ -53,7 +53,7 @@ public class RestaurantService {
     private String STARS_FIELD = "stars";
     private String COUNT_STARS_FIELD = "countStars";
     private String TAGS_FIELD = "tags";
-    private Double KM_RADIUS = 30D;
+    private Double DEFAULT_KM_RADIUS = 30D;
     private Integer SIZE_CALENDAR = 45;
     private String RESTAURANT_CONFIG_COLLECTION = "restaurant_configs";
     private String SLOTS_FIELD = "slots";
@@ -222,13 +222,13 @@ public class RestaurantService {
         this.mongoTemplate.updateMulti(query, update, RESTAURANTS_COLLECTION);
     }
 
-    public List<Restaurant> getByTags(Double lat, Double lng, List<String> tags, Integer topMembership, String freeText) {
+    public List<Restaurant> getByTags(Double lat, Double lng, Double radius, List<String> tags, Integer topMembership, String freeText) {
         List<String> freeTextList = Arrays.asList(Strings.delimitedListToStringArray(freeText, " "));
 
         Query query = new Query();
 
         Point geoPoint = new Point(lng, lat);
-        Distance geoDistance = new Distance(KM_RADIUS, Metrics.KILOMETERS);
+        Distance geoDistance = new Distance(radius != null ? radius : DEFAULT_KM_RADIUS, Metrics.KILOMETERS);
         Circle geoCircle = new Circle(geoPoint, geoDistance);
         query.addCriteria(Criteria.where(LOCATION_FIELD).withinSphere(geoCircle));
 
@@ -294,9 +294,9 @@ public class RestaurantService {
 
     public Restaurant getRestaurantById(String restaurantId) {
         Restaurant r = this.findById(restaurantId);
-        r.setStars(r.getStars() / r.getCountStars());
+        r.setAverageStars();
         r.getDishes().sort(Comparator.comparing(Dish::getBaseMembershipName));
-        r.getDishes().forEach(d -> d.setStars(d.getStars() / d.getCountStars()));
+        r.getDishes().forEach(Dish::setAverageStars);
         return r;
     }
 

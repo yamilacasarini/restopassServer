@@ -114,4 +114,11 @@ public class Restaurant {
     public void setDishes(List<Dish> dishes) {
         this.dishes = dishes;
     }
+
+    public void setAverageStars() {
+        Integer countStars = getCountStars();
+        if (countStars != 0) {
+            this.setStars(getStars() / countStars);
+        }
+    }
 }

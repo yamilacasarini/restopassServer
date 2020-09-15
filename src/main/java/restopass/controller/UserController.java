@@ -117,6 +117,16 @@ public class UserController {
         this.userService.updateUserInfo(userUpdateRequest, changePasswordRequest.getEmail());
     }
 
+    @RequestMapping(value = "/topic/subscribe", method = RequestMethod.PATCH)
+    public void subscribeToTopic(HttpServletRequest request) {
+        String userId = request.getAttribute(USER_ID_ATTR).toString();
+        this.userService.subscribeToTopic(userId);
+    }
 
+    @RequestMapping(value = "/topic/unsubscribe", method = RequestMethod.PATCH)
+    public void unsubscribeToTopic(HttpServletRequest request) {
+        String userId = request.getAttribute(USER_ID_ATTR).toString();
+        this.userService.unsubscribeToTopic(userId);
+    }
 
 }

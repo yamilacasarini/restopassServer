@@ -35,24 +35,28 @@ public class UserRestaurantService extends GenericUserService {
         }
 
         Restaurant restaurant = this.restaurantService.findById(userRestaurant.getRestaurantId());
-        userRestaurant.setEmail(restaurant.getName().replaceAll(" ","").toLowerCase() + RESTOPASS_MAIL);
+        userRestaurant.setEmail(restaurant.getName().replaceAll(" ", "").toLowerCase() + RESTOPASS_MAIL);
         this.userRestaurantRepository.save(userRestaurant);
     }
 
     public UserLoginResponse<UserRestaurant> loginRestaurantUser(UserLoginRequest userLoginRequest) {
         UserLoginResponse<UserRestaurant> user = this.loginUser(userLoginRequest);
-        Restaurant restaurant = this.restaurantService.findById(user.getUser().getRestaurantId());
-        restaurant.getDishes().sort(Comparator.comparing(Dish::getBaseMembershipName));
-        restaurant.getDishes().forEach(d -> d.setStars(d.getStars() / d.getCountStars()));
-        restaurant.setStars(restaurant.getStars() / restaurant.getCountStars());
-        user.getUser().setRestaurant(restaurant);
+        this.setRestaurantInfo(user);
         return user;
     }
 
     public UserLoginResponse<UserRestaurant> refreshRestaurantToken(HttpServletRequest req) {
         UserLoginResponse<UserRestaurant> user = this.refreshToken(req);
-        user.getUser().setRestaurant(this.restaurantService.findById(user.getUser().getRestaurantId()));
+        this.setRestaurantInfo(user);
         return user;
+    }
+
+    private void setRestaurantInfo(UserLoginResponse<UserRestaurant> user) {
+        Restaurant restaurant = this.restaurantService.findById(user.getUser().getRestaurantId());
+        restaurant.getDishes().sort(Comparator.comparing(Dish::getBaseMembershipName));
+        restaurant.getDishes().forEach(Dish::setAverageStars);
+        restaurant.setAverageStars();
+        user.getUser().setRestaurant(restaurant);
     }
 
     public void deleteUserRestaurant(String userId) {

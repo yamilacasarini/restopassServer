@@ -21,7 +21,7 @@ public class UserRestaurantController {
 
     private String USER_ID_ATTR = "userId";
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public void createUser(@RequestBody UserRestaurant user) {
         this.userRestaurantService.createUserRestaurant(user);
     }

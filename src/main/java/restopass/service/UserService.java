@@ -39,6 +39,7 @@ public class UserService extends GenericUserService {
     private static String SECONDARY_EMAILS_FIELD = "secondaryEmails";
     private static String TO_CONFIRM_EMAILS_FIELD = "toConfirmEmails";
     private static String RECOVER_PASSWORD_TOKEN_FIELD = "recoverPasswordToken";
+    private static String IS_SUBSCRIBED_TO_TOPIC_FIELD = "isSubscribedToTopic";
     private static String USER_COLLECTION = "users";
 
     MongoTemplate mongoTemplate;
@@ -373,8 +374,6 @@ public class UserService extends GenericUserService {
         }
     }
 
-
-
     public void verifyRecoverPassword(String userId, String token) {
         Query query = new Query();
         query.addCriteria(Criteria.where(EMAIL_FIELD).is(userId));
@@ -388,5 +387,21 @@ public class UserService extends GenericUserService {
             Update update = new Update().unset(RECOVER_PASSWORD_TOKEN_FIELD);
             this.mongoTemplate.updateMulti(query, update, USER_COLLECTION);
         }
+    }
+
+    public void subscribeToTopic(String userId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(EMAIL_FIELD).is(userId));
+
+        Update update = new Update().set(IS_SUBSCRIBED_TO_TOPIC_FIELD, true);
+        this.mongoTemplate.updateMulti(query, update, USER_COLLECTION);
+    }
+
+    public void unsubscribeToTopic(String userId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(EMAIL_FIELD).is(userId));
+
+        Update update = new Update().set(IS_SUBSCRIBED_TO_TOPIC_FIELD, false);
+        this.mongoTemplate.updateMulti(query, update, USER_COLLECTION);
     }
 }

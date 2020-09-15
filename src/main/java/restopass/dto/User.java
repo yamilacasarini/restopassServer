@@ -21,6 +21,7 @@ public class User extends GenericUser {
     private LocalDateTime membershipFinalizeDate;
     private LocalDateTime membershipEnrolledDate;
     private String recoverPasswordToken;
+    private Boolean isSubscribedToTopic = true;
 
     public User() {
         super();
@@ -127,5 +128,13 @@ public class User extends GenericUser {
 
     public void setRecoverPasswordToken(String recoverPasswordToken) {
         this.recoverPasswordToken = recoverPasswordToken;
+    }
+
+    public Boolean getSubscribedToTopic() {
+        return isSubscribedToTopic;
+    }
+
+    public void setSubscribedToTopic(Boolean subscribedToTopic) {
+        isSubscribedToTopic = subscribedToTopic;
     }
 }

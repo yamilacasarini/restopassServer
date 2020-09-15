@@ -88,4 +88,11 @@ public class Dish {
     public void setBaseMembershipName(String baseMembershipName) {
         this.baseMembershipName = baseMembershipName;
     }
+
+    public void setAverageStars() {
+        Integer countStars = getCountStars();
+        if (countStars != 0) {
+            this.setStars(getStars() / countStars);
+        }
+    }
 }
